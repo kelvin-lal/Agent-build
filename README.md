@@ -1,4 +1,4 @@
-# Agent Integrations - Take Home Exercise
+# Build my own Agent
 
 ## Description
 A Python-based Agent that collects system metrics and sends them to Datadog via the Datadog API. The agent runs in the background with a command line menu to check the Agent Status as well as input an API key at to stop/exit the Agent
