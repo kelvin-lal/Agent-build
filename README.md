@@ -25,7 +25,7 @@ A Python-based Agent that collects system metrics and sends them to Datadog via 
 
 ## Project Structure
 ```
-agentIntegrationsTest/
+Agent/
 ├── run.py                  # Entry point
 ├── agent/
 │   ├── __init__.py
