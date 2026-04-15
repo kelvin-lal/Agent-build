@@ -5,11 +5,11 @@ A Python-based Agent that collects system metrics and sends them to Datadog via 
 
 ## Installation
 - For US1 Site
-    - install the project, and run 'python run.py' from the home /agentIntegrationsTest directory
+    - install the project, and run 'python run.py' from the home /agent directory
 - For all other sites
     - install the project
-    - change the DD_SITE parameter in /agentIntegrationsTest/agent/config.py file
-    - run 'python run.py' from the home /agentIntegrationsTest directory
+    - change the DD_SITE parameter in /agent/agent/config.py file
+    - run 'python run.py' from the home /agent directory
 
 ## Key errors faced
 - Retrieving metrics
@@ -18,8 +18,6 @@ A Python-based Agent that collects system metrics and sends them to Datadog via 
         We can just use '/' for now, need to revisit this for a better solution, as a defined path configuration or maybe some kind of autodiscovery would be better here
 - Dynamic class implimentation
     - Key error faced was attempting to populate the checks in the checkRun.py file with the correct check name, as the goal was to have the check class have the metric type attribute populated automatically with a check, similar to how the Datadog Agent automatically grabs the itnegration/check name. This was uncompleted and a hardcode for the check names was completed
-- Incorrect Check/Integration implimentation
-    - From the description of this exercise, adding 'At least one integration or check' was a key mistake/point of confusion from this project. Initially, I had believes this meant a check for the Agent/metrics being sent, similar to the checks that are run in a DD Agent status.log. Unfortunately, on the final day, I realized this most likely relates to a custom check that needs to be implimented. At the last second, I added a quick customCheck.py that sends a metric via the DD API. 
 
 # Design discussion
 
@@ -92,7 +90,7 @@ Simple python file to be run at the CLI. It initializes the code by sending you 
 - **Function**: `check_print(check)` — Prints metric type, count, and OK/Error status
 
 #### `customCheck.py`
-- **Purpose**: Base class for any user-defined custom checks/integrations that will send metrics through the same API framework as the system metrics collected by the Agent
+- **Purpose**: Base class for any user-defined custom checks/agent that will send metrics through the same API framework as the system metrics collected by the Agent
 
 ## Design Decisions
 - Having this project run from the CLI rather than a start command was something I wanted to try, as the traditional Datadog Agent is shown to have some confusion with the initial configuration and checking its status. 
@@ -110,7 +108,7 @@ Simple python file to be run at the CLI. It initializes the code by sending you 
     - Currently, only a handful of system metrics are being collected. Although the Datadog Agent also uses the psutil library, and manually gathers the metrics similar to how this Agent is implimented, it would be nice to see an autodiscovery type of implimentation to find all metrics available through a library like psutil
 - Complete Custom Check
     - Given more time, I would like to develop my own intergation/check, after some confusion for the Exercise requirements resulted in me completed a status.log type of check
-    - IMplimenting a full custom integration to collect and send metrics would be apt given more time
+    - Implimenting a full custom integration to collect and send metrics
 - Error handling for API failures
     - There is currently no error handling for any errors recieved from the Datadog API other than setting the API key, which could still be incorrect. Given more time, it would nice to add some error handling, especially and the API is the crux of this exercise
 
