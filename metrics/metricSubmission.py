@@ -12,6 +12,7 @@ from datadog_api_client.v2.model.metric_series import MetricSeries
 
 
 def metric_submission(metric_name, metric_value):
+  try:
     body = MetricPayload(
         series=[
             MetricSeries(
@@ -37,3 +38,5 @@ def metric_submission(metric_name, metric_value):
     with ApiClient(configuration) as api_client:
         api_instance = MetricsApi(api_client)
         response = api_instance.submit_metrics(body=body)
+  except Exception as e:
+    raise Exception(f"Failed to submit metric '{metric_name}': {e}")
