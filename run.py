@@ -1,6 +1,5 @@
 """
-Agent Integrations - Take home Exercise
-Kelvin Lal
+Kelvin's Agent
 """
 from agent.menu import menu
 

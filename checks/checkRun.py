@@ -1,6 +1,5 @@
 """
-Agent Integrations - Take home Exercise
-Kelvin Lal
+Kelvin's Agent
 """
 from checks.checkPrint import check_print
 from checks.customCheck import CustomCheck
