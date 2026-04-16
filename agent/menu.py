@@ -5,6 +5,33 @@ import threading
 from agent import agent as agent_module
 import checks.checkRun as checks
 from agent.config import config
+from metrics.metricsConfig import metrics_config
+
+def configuration_menu():
+    while True:
+        print("\n--- Configuration ---")
+        print(f"Current metric collection frequency: {metrics_config.get_submission_interval()}s")
+        print("1. Change metric collection frequency")
+        print("2. Back")
+        choice = input("Enter:")
+
+        match choice:
+            case "1":
+                raw = input("Enter metric collection frequency (seconds, e.g. 1.2):")
+                try:
+                    interval = float(raw)
+                    if interval <= 0:
+                        print("Frequency must be greater than 0.")
+                        continue
+                    metrics_config.set_submission_interval(interval)
+                    print(f"Metric collection frequency set to {interval}s")
+                except ValueError:
+                    print("Invalid input. Please enter a number.")
+            case "2" | "back" | "Back":
+                return
+            case _:
+                print("Invalid choice")
+
 
 def menu(): 
     agent_thread = None
@@ -27,6 +54,7 @@ def menu():
             print("1. Stop")
             print("2. Exit")
             print("3. Status Check")
+            print("4. Configuration")
             choice = input("Enter:")
             
             match choice:
@@ -48,12 +76,15 @@ def menu():
                         checks.Check.metricsCheck()
                     except Exception as e:
                         print(f"[ERROR] Status check failed: {e}")
+                case "4" | "configuration" | "Configuration":
+                    configuration_menu()
                 case _:
                     print("Invalid choice")
         else:
             print("1. Start")
             print("2. Enter API Key")
             print("3. Exit")
+            print("4. Configuration")
             choice = input("Enter:")
             
             match choice:
@@ -74,6 +105,8 @@ def menu():
                 case "3" | "exit" | "Exit":
                     print("Exiting...")
                     return
+                case "4" | "configuration" | "Configuration":
+                    configuration_menu()
                 case _:
                     print("Invalid choice")
       except EOFError:

@@ -6,6 +6,7 @@ import os
 import time
 from metrics.metrics import Metrics
 from metrics.metricSubmission import metric_submission
+from metrics.metricsConfig import metrics_config
 from checks.checkRun import Check
 from agent.config import config
 from checks.customCheck import CustomCheck
@@ -83,7 +84,7 @@ def agent():
         if agent_error_count >= MAX_ERRORS:
             break
         
-        time.sleep(1)
+        time.sleep(metrics_config.get_submission_interval())
 
     agent_running = False
     if agent_error_count < MAX_ERRORS:
