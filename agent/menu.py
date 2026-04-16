@@ -6,6 +6,49 @@ from agent import agent as agent_module
 import checks.checkRun as checks
 from agent.config import config
 from metrics.metricsConfig import metrics_config
+from metrics.tags.customTags import custom_tag_store
+
+def custom_tags_menu():
+    while True:
+        print("\n--- Custom Tags ---")
+        tags = custom_tag_store.get_tags()
+        if tags:
+            print(f"Current tags: {', '.join(tags)}")
+        else:
+            print("Current tags: (none)")
+        print("1. Add tag")
+        print("2. Remove tag")
+        print("3. Back")
+        choice = input("Enter:")
+
+        match choice:
+            case "1":
+                tag = input("Enter tag (key:value format): ")
+                if custom_tag_store.add(tag):
+                    print(f"Tag '{tag}' added.")
+            case "2":
+                tags = custom_tag_store.get_tags()
+                if not tags:
+                    print("No custom tags to remove.")
+                    continue
+                print("Select a tag to remove:")
+                custom_tag_store.list_tags()
+                raw = input("Enter number: ")
+                try:
+                    idx = int(raw) - 1
+                    if 0 <= idx < len(tags):
+                        removed = tags[idx]
+                        custom_tag_store.remove(removed)
+                        print(f"Tag '{removed}' removed.")
+                    else:
+                        print("Invalid selection.")
+                except ValueError:
+                    print("Invalid input. Please enter a number.")
+            case "3" | "back" | "Back":
+                return
+            case _:
+                print("Invalid choice")
+
 
 def configuration_menu():
     while True:
@@ -13,7 +56,8 @@ def configuration_menu():
         print(f"Metric collection interval: {metrics_config.get_collection_interval()}s (fixed)")
         print(f"Metric submission interval: {metrics_config.get_submission_interval()}s")
         print("1. Change metric submission frequency")
-        print("2. Back")
+        print("2. Manage custom tags")
+        print("3. Back")
         choice = input("Enter:")
 
         match choice:
@@ -31,7 +75,9 @@ def configuration_menu():
                     print(f"Metric submission frequency set to {actual}s")
                 except ValueError:
                     print("Invalid input. Please enter a number.")
-            case "2" | "back" | "Back":
+            case "2":
+                custom_tags_menu()
+            case "3" | "back" | "Back":
                 return
             case _:
                 print("Invalid choice")

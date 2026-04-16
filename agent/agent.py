@@ -13,6 +13,7 @@ from agent.config import config
 from checks.customCheck import CustomCheck
 from metrics.tags.tagProvider import HostTagProvider
 from metrics.tags.tagEnricher import TagEnricher
+from metrics.tags.customTags import custom_tag_store
 
 
 agent_running = False
@@ -46,7 +47,7 @@ def agent():
         custom_check = CustomCheck()
         buffer = MetricBuffer()
         tag_provider = HostTagProvider()
-        tag_enricher = TagEnricher(tag_provider)
+        tag_enricher = TagEnricher(tag_provider, custom_tag_store)
     except Exception as e:
         print(f"[ERROR] Failed to initialize collectors: {e}")
         agent_running = False

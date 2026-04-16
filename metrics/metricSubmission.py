@@ -1,5 +1,5 @@
 """
-Metric Submission - Handles sending metrics to Datadog
+Kelvin's Agent
 """
 from datetime import datetime
 from datadog_api_client import ApiClient, Configuration
