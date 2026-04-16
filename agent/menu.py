@@ -10,21 +10,25 @@ from metrics.metricsConfig import metrics_config
 def configuration_menu():
     while True:
         print("\n--- Configuration ---")
-        print(f"Current metric collection frequency: {metrics_config.get_submission_interval()}s")
-        print("1. Change metric collection frequency")
+        print(f"Metric collection interval: {metrics_config.get_collection_interval()}s (fixed)")
+        print(f"Metric submission interval: {metrics_config.get_submission_interval()}s")
+        print("1. Change metric submission frequency")
         print("2. Back")
         choice = input("Enter:")
 
         match choice:
             case "1":
-                raw = input("Enter metric collection frequency (seconds, e.g. 1.2):")
+                raw = input("Enter metric submission frequency (seconds, minimum 1.0, e.g. 1.5):")
                 try:
                     interval = float(raw)
                     if interval <= 0:
                         print("Frequency must be greater than 0.")
                         continue
                     metrics_config.set_submission_interval(interval)
-                    print(f"Metric collection frequency set to {interval}s")
+                    actual = metrics_config.get_submission_interval()
+                    if actual != interval:
+                        print(f"Value clamped to minimum {actual}s")
+                    print(f"Metric submission frequency set to {actual}s")
                 except ValueError:
                     print("Invalid input. Please enter a number.")
             case "2" | "back" | "Back":

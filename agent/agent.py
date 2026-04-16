@@ -5,7 +5,8 @@ Kelvin's Agent
 import os
 import time
 from metrics.metrics import Metrics
-from metrics.metricSubmission import metric_submission
+from metrics.metricSubmission import metric_submission, metric_batch_submission
+from metrics.metricBuffer import MetricBuffer
 from metrics.metricsConfig import metrics_config
 from checks.checkRun import Check
 from agent.config import config
@@ -16,6 +17,12 @@ agent_running = False
 agent_error_count = 0
 agent_last_error = None
 MAX_ERRORS = 10
+
+
+def _flush_buffer(buffer):
+    series_list = buffer.flush()
+    if series_list:
+        metric_batch_submission(series_list)
 
 
 def agent():
@@ -34,16 +41,19 @@ def agent():
     try:
         metrics = Metrics()
         custom_check = CustomCheck()
+        buffer = MetricBuffer()
     except Exception as e:
         print(f"[ERROR] Failed to initialize collectors: {e}")
         agent_running = False
         return
-    
+
+    last_flush_time = time.monotonic()
+
     while agent_running:
         try:
             cpu_metrics = metrics.cpuMetrics()
             for metric_name, metric_value in cpu_metrics.items():
-                metric_submission(metric_name, metric_value)
+                buffer.add(metric_name, metric_value)
                 Check.metric_counts["cpu"] += 1
         except Exception as e:
             agent_error_count += 1
@@ -54,7 +64,7 @@ def agent():
         try:
             memory_metrics = metrics.memoryMetrics()
             for metric_name, metric_value in memory_metrics.items():
-                metric_submission(metric_name, metric_value)
+                buffer.add(metric_name, metric_value)
                 Check.metric_counts["memory"] += 1
         except Exception as e:
             agent_error_count += 1
@@ -65,8 +75,8 @@ def agent():
         try:
             disk_metrics = metrics.diskMetrics()
             for metric_name, metric_value in disk_metrics.items():
-                metric_submission(metric_name, metric_value)
-                Check.metric_counts["disk"] += 1 
+                buffer.add(metric_name, metric_value)
+                Check.metric_counts["disk"] += 1
         except Exception as e:
             agent_error_count += 1
             agent_last_error = f"Disk metric collection failed: {e}"
@@ -83,8 +93,23 @@ def agent():
 
         if agent_error_count >= MAX_ERRORS:
             break
-        
-        time.sleep(metrics_config.get_submission_interval())
+
+        elapsed = time.monotonic() - last_flush_time
+        if elapsed >= metrics_config.get_submission_interval():
+            try:
+                _flush_buffer(buffer)
+            except Exception as e:
+                agent_error_count += 1
+                agent_last_error = f"Metric flush failed: {e}"
+                print(f"[ERROR] ({agent_error_count}/{MAX_ERRORS}) {agent_last_error}")
+            last_flush_time = time.monotonic()
+
+        time.sleep(metrics_config.get_collection_interval())
+
+    try:
+        _flush_buffer(buffer)
+    except Exception as e:
+        print(f"[ERROR] Final flush failed: {e}")
 
     agent_running = False
     if agent_error_count < MAX_ERRORS:

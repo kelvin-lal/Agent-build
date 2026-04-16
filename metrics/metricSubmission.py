@@ -40,3 +40,16 @@ def metric_submission(metric_name, metric_value):
         response = api_instance.submit_metrics(body=body)
   except Exception as e:
     raise Exception(f"Failed to submit metric '{metric_name}': {e}")
+
+
+def metric_batch_submission(series_list):
+  if not series_list:
+    return
+  try:
+    body = MetricPayload(series=series_list)
+    configuration = Configuration()
+    with ApiClient(configuration) as api_client:
+        api_instance = MetricsApi(api_client)
+        response = api_instance.submit_metrics(body=body)
+  except Exception as e:
+    raise Exception(f"Failed to submit metric batch ({len(series_list)} series): {e}")
