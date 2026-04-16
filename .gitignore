@@ -1,4 +1,8 @@
 # Python bytecode
 __pycache__/
 *.pyc
-*.pyo.cursor/
+*.pyo
+.cursor/
+
+# Persisted agent settings
+settings/

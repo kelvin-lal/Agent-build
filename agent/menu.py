@@ -7,6 +7,7 @@ import checks.checkRun as checks
 from agent.config import config
 from metrics.metricsConfig import metrics_config
 from metrics.tags.customTags import custom_tag_store
+from agent.settings import settings
 
 def custom_tags_menu():
     while True:
@@ -57,7 +58,8 @@ def configuration_menu():
         print(f"Metric submission interval: {metrics_config.get_submission_interval()}s")
         print("1. Change metric submission frequency")
         print("2. Manage custom tags")
-        print("3. Back")
+        print("3. Purge local settings")
+        print("4. Back")
         choice = input("Enter:")
 
         match choice:
@@ -77,7 +79,18 @@ def configuration_menu():
                     print("Invalid input. Please enter a number.")
             case "2":
                 custom_tags_menu()
-            case "3" | "back" | "Back":
+            case "3":
+                confirm = input("This will erase all saved settings. Are you sure? (y/n): ")
+                if confirm.lower() == "y":
+                    settings.purge()
+                    metrics_config.submission_interval = 1.0
+                    custom_tag_store._lock.acquire()
+                    custom_tag_store._tags.clear()
+                    custom_tag_store._lock.release()
+                    print("All local settings purged. Defaults restored.")
+                else:
+                    print("Purge cancelled.")
+            case "4" | "back" | "Back":
                 return
             case _:
                 print("Invalid choice")
