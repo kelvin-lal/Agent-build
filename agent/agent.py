@@ -11,6 +11,8 @@ from metrics.metricsConfig import metrics_config
 from checks.checkRun import Check
 from agent.config import config
 from checks.customCheck import CustomCheck
+from metrics.tags.tagProvider import HostTagProvider
+from metrics.tags.tagEnricher import TagEnricher
 
 
 agent_running = False
@@ -19,10 +21,11 @@ agent_last_error = None
 MAX_ERRORS = 10
 
 
-def _flush_buffer(buffer):
+def _flush_buffer(buffer, enricher):
     series_list = buffer.flush()
     if series_list:
-        metric_batch_submission(series_list)
+        enriched = enricher.enrich(series_list)
+        metric_batch_submission(enriched)
 
 
 def agent():
@@ -42,6 +45,8 @@ def agent():
         metrics = Metrics()
         custom_check = CustomCheck()
         buffer = MetricBuffer()
+        tag_provider = HostTagProvider()
+        tag_enricher = TagEnricher(tag_provider)
     except Exception as e:
         print(f"[ERROR] Failed to initialize collectors: {e}")
         agent_running = False
@@ -97,7 +102,7 @@ def agent():
         elapsed = time.monotonic() - last_flush_time
         if elapsed >= metrics_config.get_submission_interval():
             try:
-                _flush_buffer(buffer)
+                _flush_buffer(buffer, tag_enricher)
             except Exception as e:
                 agent_error_count += 1
                 agent_last_error = f"Metric flush failed: {e}"
@@ -107,7 +112,7 @@ def agent():
         time.sleep(metrics_config.get_collection_interval())
 
     try:
-        _flush_buffer(buffer)
+        _flush_buffer(buffer, tag_enricher)
     except Exception as e:
         print(f"[ERROR] Final flush failed: {e}")
 

@@ -1,9 +1,5 @@
 """
-Kelvin's Agent - In-memory metric buffer
-
-Inspired by the Datadog agent's TimeSampler.metricsByTimestamp pattern:
-metrics are collected into a buffer and flushed (drained) on a separate
-submission interval.
+Kelvin's Agent 
 """
 import threading
 from datetime import datetime
@@ -30,7 +26,7 @@ class MetricBuffer:
             ],
             resources=[
                 MetricResource(
-                    name="dummyhost",
+                    name="unknown",
                     type="host",
                 ),
             ],
