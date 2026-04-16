@@ -23,22 +23,32 @@ A Python-based Agent that collects system metrics and sends them to Datadog via 
 
 ## Project Structure
 ```
-Agent/
-├── run.py                  # Entry point
+Agent-build/
+├── run.py                      # Entry point
+├── __init__.py
 ├── agent/
 │   ├── __init__.py
-│   ├── agent.py            # Core Agent
-│   ├── menu.py             # CLI interface
-│   └── config.py           # Configuration file
+│   ├── agent.py                # Core Agent
+│   ├── menu.py                 # CLI interface
+│   ├── config.py               # Configuration file
+│   └── settings.py             # Agent settings
 ├── metrics/
-│   ├── __init__.py
-│   ├── metrics.py          # System metric collection
-│   └── metricSubmission.py # Datadog API submission
+│   ├── metrics.py              # System metric collection
+│   ├── metricSubmission.py     # Datadog API submission
+│   ├── metricBuffer.py         # Metric buffering
+│   ├── metricsConfig.py        # Metrics configuration
+│   └── tags/
+│       ├── __init__.py
+│       ├── customTags.py       # Custom tag definitions
+│       ├── tagEnricher.py      # Tag enrichment logic
+│       └── tagProvider.py      # Tag provider interface
 ├── checks/
 │   ├── __init__.py
-│   ├── checkRun.py         # Status Check implementation
-│   ├── checkPrint.py       # Status Check Formatting
-│   └── customCheck.py      # Custom check implementation
+│   ├── checkRun.py             # Status check implementation
+│   ├── checkPrint.py           # Status check formatting
+│   └── customCheck.py          # Custom check implementation
+├── settings/
+│   └── agent_settings.json     # Persistent agent settings
 └── .gitignore
 ```
 ## Component Details
